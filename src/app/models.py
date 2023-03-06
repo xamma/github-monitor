@@ -10,4 +10,4 @@ class AppConfig(BaseModel):
     repo_list : List | None = None
     github_token : str | None = None
     discord_token : str | None = None
-    discord_channel_name: str | None = None
+    discord_channel_id: int | None = None

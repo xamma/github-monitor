@@ -1,6 +1,6 @@
 import os
 from typing import List
-from models import AppConfig
+from app.models import AppConfig
 
 #-Set user config-----------------------
 """
@@ -9,10 +9,10 @@ Make sure to match the types defined in the AppConfig in models.py
 """
 
 user_data = {
-  "repo_list": [],
+  "repo_list": ["xamma/testrepo123", "xamma/testrepo234"],
   "github_token": "",
   "discord_token": "",
-  "discord_channel_name": ""
+  "discord_channel_id": 1082199072984797245
 }
 
 #-Create settings object----------------
@@ -35,6 +35,8 @@ for key, val in config_settings.dict().items():
       # Check if the type annotation of the attribute is List, and if it is, convert the value to a list
       if isinstance(val, List):
         setattr(config_settings, key, os.environ.get(env).split(', ') if ', ' in os.environ.get(env) else os.environ.get(env).split(','))
+      elif isinstance(val, int):
+        setattr(int(config_settings, key, os.environ.get(env)))
       else:
         setattr(config_settings, key, os.environ.get(env))
     except Exception as e:

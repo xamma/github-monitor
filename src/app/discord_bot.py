@@ -1,7 +1,7 @@
-import time
 import discord
 from github import Github
-import threading
+import asyncio
+from typing import List
 
 #-Logger-----------------------------------
 import logging
@@ -9,14 +9,13 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 #-Settings---------------------------------
-from config import config_settings
+from app.config import config_settings
 
-class DiscordBot:
+class DiscordBot(discord.Client):
     """
     The Bot informs a defined Discord-Channel about changes/commits to Github
     repositories. These can be defined in the config.py.
-    This function is running in one Thread per Repo, to ensure performance and 
-    to make monitoring of multiple Repos possible.
+    This function is running every 60 secs.
     The discord client needs to be configured with the right intents for interacting
     with the channel.
     """
@@ -24,36 +23,49 @@ class DiscordBot:
         self.github_client = Github(config_settings.github_token)
         intents = discord.Intents().all()
         self.discord_client = discord.Client(intents=intents)
+        self.ch = None
+        self.message_comp = []
 
-    async def get_discord_channelobj(self):
-        for guild in self.discord_client.guilds:
-            for channel in guild.channels:
-                if channel.name == config_settings.discord_channel_name:
-                    return channel
+        # @self.discord_client.event
+        # async def on_ready():
+        #     print(f'{self.discord_client.user} has connected to Discord!')
 
-    # Function to check for new commits
-    def check_for_new_commits(self, repo_name:str):
-        channel = self.discord_client.loop.run_until_complete(self.get_discord_channelobj())
-        while True:
-            repo = self.github_client.get_repo(repo_name)
+    # Async event-listener for initialization of the discord client
+    async def get_ready(self):
+        @self.discord_client.event
+        async def on_ready():
+            print(f'{self.discord_client.user} has connected to Discord!')
+            self.ch = self.discord_client.get_channel(config_settings.discord_channel_id)
+            await self.ch.send(f"Hi, I'm monitoring your Github-Repos: {config_settings.repo_list}")
+            while True:
+                await self.check_for_new_commits(config_settings.repo_list)
+                await asyncio.sleep(60)
+
+    async def check_for_new_commits(self, repo_list:List):
+        for entry in repo_list:
+            repo = self.github_client.get_repo(entry)
             commits = repo.get_commits()
-            logger.info(repo_name)
-            logger.info(commits)
-            # if commits.totalCount > 0:
-            #     author = commits[0].commit.author.name
-            #     message = commits[0].commit.message
-            #     commit_url = commits[0].html_url
+            if commits.totalCount > 0:
+                author = commits[0].commit.author.name
+                message = commits[0].commit.message
+                commit_url = commits[0].html_url
 
-            #     # Send a message to the Discord server with the commit details
-            #     self.discord_client.loop.create_task(channel.send('New commit by {}: {} \n {}'.format(author, message, commit_url)))
-            # time.sleep(60)
-
-    # Function to start the commit check threads
-    def start_commit_check_threads(self):
-        for repo_name in config_settings.repo_list:
-            threading.Thread(target=self.check_for_new_commits, args=(repo_name,), daemon=True).start()
+                if message not in self.message_comp:
+                    # Send a message to the Discord server with the commit details
+                    await self.ch.send(f'New commit by {author} in {repo}: {message} \n {commit_url}')
+                    self.message_comp.append(message)
+                else:
+                    pass
+    
+    async def greet_members(self):
+        @self.discord_client.event
+        async def on_member_join(member):
+            await member.create_dm()
+            await member.dm_channel.send(
+                f'Hi {member.name}, welcome to my Discord server!'
+            )
 
     # Function to start the Discord bot
     def run(self):
-        self.start_commit_check_threads()
+        asyncio.run(self.get_ready())
         self.discord_client.run(config_settings.discord_token)
