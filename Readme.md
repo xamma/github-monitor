@@ -10,7 +10,22 @@ This is a microservice for running on K8s.
 Do the configuration in the ```k8s_stack.yaml```.  
 Then apply the Kubernetes Manifest: ```kubectl apply -f k8s_stack.yaml```.  
 
-## Running locally
+### Running locally
 ```
 python runner.py
+```
+
+### Build image
+```
+docker build -t discord-bot:latest .
+```
+
+### Run Container
+```
+docker run -d \
+    -e REPO_LIST="xamma/testrepo123" \
+    -e DISCORD_TOKEN="SECRET" \
+    -e GITHUB_TOKEN="SECRET" \
+    -e DISCORD_CHANNEL_ID=1082199072984797245 \
+    discord-bot:latest
 ```
