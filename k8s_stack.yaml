@@ -10,6 +10,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name:  Name_of_the_Secret
+  namespace: discord-bot
 data:
   .dockerconfigjson:  secret
 type: kubernetes.io/dockerconfigjson
@@ -46,13 +47,14 @@ data:
   REPO_LIST: |
     - repo1
     - repo2
-  DISCORD_CHANNEL_NAME: 1082199072984797245
+  DISCORD_CHANNEL_ID: 1082199072984797245
 
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name:  discord-bot-dep
+  namespace: discord-bot
   labels:
     name:  my-name
 spec:
@@ -106,6 +108,7 @@ kind: Service
 apiVersion: v1
 metadata:
   name: discord-bot-svc
+  namespace: discord-bot
 spec:
   selector:
     app:  Selector Label
