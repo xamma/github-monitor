@@ -10,6 +10,4 @@ COPY /src /app
 
 WORKDIR /app
 
-EXPOSE 8000
-
 CMD python runner.py

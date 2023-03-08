@@ -5,15 +5,16 @@ metadata:
 
 ---
 # kubectl create secret docker-registry NAME --docker-username=user --docker-password=password --docker-email=email [--docker-server=string] [--from-literal=key1=value1] [--dry-run] 
-# dockerconfigjson is a base64 encoded string:  cat ~/.docker/config.json | base64 -w 0 
+# echo -n "username:token" | base64
+# echo -n  '{"auths":{"ghcr.io":{"auth":"base64-encoded secret from above"}}}' | base64
 apiVersion: v1
 kind: Secret
 metadata:
-  name:  Name_of_the_Secret
+  name: ghcr-creds
   namespace: discord-bot
-data:
-  .dockerconfigjson:  secret
 type: kubernetes.io/dockerconfigjson
+data:
+  .dockerconfigjson: VERYBASESECRET
 
 ---
 apiVersion: v1
@@ -41,12 +42,12 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: my-configmap
+  name: bot-configmap
   namespace: discord-bot
 data:
   REPO_LIST:
-    - repo1
-    - repo2
+    - xamma/testrepo123
+    - xamma/testrepo234
   DISCORD_CHANNEL_ID: 1082199072984797245
 
 ---
@@ -56,8 +57,7 @@ metadata:
   name:  discord-bot-dep
   namespace: discord-bot
   labels:
-    name:  my-name
-spec:
+    app: github-monitor
   replicas: 1
   strategy:
     rollingUpdate:
@@ -67,8 +67,10 @@ spec:
   template:
     metadata:
       labels:
-        name:  my-name
+        app: github-monitor
     spec:
+      imagePullSecrets:
+      - name:  ghcr-creds
       containers:
       - image:  ipedrazas/docmock
         name:  my-name
@@ -80,13 +82,13 @@ spec:
           - name: REPO_LIST
             valueFrom:
               configMapKeyRef:
-                name: my-configmap
+                name: bot-configmap
                 key: REPO_LIST
-          - name: DISCORD_CHANNEL_NAME
+          - name: DISCORD_CHANNEL_ID
             valueFrom:
               configMapKeyRef:
-                name: my-configmap
-                key: DISCORD_CHANNEL_NAME
+                name: bot-configmap
+                key: DISCORD_CHANNEL_ID
           - name: GITHUB_TOKEN
             valueFrom:
               secretKeyRef:
@@ -97,23 +99,24 @@ spec:
               secretKeyRef:
                 name: discord-token
                 key: token 
-        ports:
-        - containerPort:  5000
-          name:  my-name
+        # ports:
+        # - containerPort:  5000
+        #   name:  my-name
       restartPolicy: OnFailure
       imagePullPolicy: Always
 
----
-kind: Service
-apiVersion: v1
-metadata:
-  name: discord-bot-svc
-  namespace: discord-bot
-spec:
-  selector:
-    app:  Selector Label
-  type: ClusterIP
-  ports:
-  - name:  name-of-the-port
-    port:  80
-    targetPort:  8080
+# not needed here, but for completeness
+# ---
+# kind: Service
+# apiVersion: v1
+# metadata:
+#   name: discord-bot-svc
+#   namespace: discord-bot
+# spec:
+#   selector:
+#     app:  github-monitor
+#   type: ClusterIP
+#   ports:
+#   - name:  name-of-the-port
+#     port:  80
+#     targetPort:  8080
