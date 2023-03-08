@@ -72,8 +72,8 @@ metadata:
       imagePullSecrets:
       - name:  ghcr-creds
       containers:
-      - image:  ipedrazas/docmock
-        name:  my-name
+      - image: ghcr.io/xamma/github-monitor:latest
+        name:  discord-bot
         resources:
           requests:
             cpu: "20m"
