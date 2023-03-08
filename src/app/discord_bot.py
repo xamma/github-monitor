@@ -11,7 +11,7 @@ logger.setLevel(logging.INFO)
 #-Settings---------------------------------
 from app.config import config_settings
 
-class DiscordBot(discord.Client):
+class DiscordBot:
     """
     The Bot informs a defined Discord-Channel about changes/commits to Github
     repositories. These can be defined in the config.py.
@@ -26,6 +26,7 @@ class DiscordBot(discord.Client):
         self.ch = None
         self.message_comp = []
 
+        # Blocks on initialization
         # @self.discord_client.event
         # async def on_ready():
         #     print(f'{self.discord_client.user} has connected to Discord!')
@@ -37,6 +38,11 @@ class DiscordBot(discord.Client):
             print(f'{self.discord_client.user} has connected to Discord!')
             self.ch = self.discord_client.get_channel(config_settings.discord_channel_id)
             await self.ch.send(f"Hi, I'm monitoring your Github-Repos: {config_settings.repo_list}")
+
+            # Call greet_members to set up the event listener
+            await self.greet_members()
+
+            # Set up Monitoring loop as main task
             while True:
                 await self.check_for_new_commits(config_settings.repo_list)
                 await asyncio.sleep(60)
@@ -63,10 +69,11 @@ class DiscordBot(discord.Client):
     async def greet_members(self):
         @self.discord_client.event
         async def on_member_join(member):
-            await member.create_dm()
-            await member.dm_channel.send(
-                f'Hi {member.name}, welcome to my Discord server!'
-            )
+            await asyncio.sleep(1)  # Delay to ensure DM channel is created
+            await asyncio.create_task(member.create_dm())
+            await asyncio.create_task(member.dm_channel.send(
+                f'Hi {member.name}, welcome to my Discord server! Enjoy your time.'
+            ))
 
     # Function to start the Discord bot
     def run(self):
