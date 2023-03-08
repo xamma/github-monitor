@@ -44,7 +44,10 @@ class DiscordBot(discord.Client):
     async def check_for_new_commits(self, repo_list:List):
         for entry in repo_list:
             repo = self.github_client.get_repo(entry)
-            commits = repo.get_commits()
+            try:
+                commits = repo.get_commits()
+            except Exception as e:
+                logger.info(f"Error getting commits: {e}")
             if commits.totalCount > 0:
                 author = commits[0].commit.author.name
                 message = commits[0].commit.message
