@@ -44,7 +44,7 @@ metadata:
   name: my-configmap
   namespace: discord-bot
 data:
-  REPO_LIST: |
+  REPO_LIST:
     - repo1
     - repo2
   DISCORD_CHANNEL_ID: 1082199072984797245

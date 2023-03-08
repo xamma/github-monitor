@@ -23,7 +23,7 @@ docker build -t discord-bot:latest .
 ### Run Container
 ```
 docker run -d \
-    -e REPO_LIST="xamma/testrepo123" \
+    -e REPO_LIST="xamma/testrepo123, xamma/testrepo234" \
     -e DISCORD_TOKEN="SECRET" \
     -e GITHUB_TOKEN="SECRET" \
     -e DISCORD_CHANNEL_ID=1082199072984797245 \
