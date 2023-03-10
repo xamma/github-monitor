@@ -1,3 +1,4 @@
 Pipfile
 **/knecht.py
 **/test.yaml
+k8s-prod.yaml
