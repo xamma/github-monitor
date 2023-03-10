@@ -1,6 +1,11 @@
-# Discord-Bot for Github Repos
+# Discord-Bot for monitoring Github Repos
+
+[![Docker Image CI](https://github.com/xamma/github-monitor/actions/workflows/docker-image.yml/badge.svg)](https://github.com/xamma/github-monitor/actions/workflows/docker-image.yml)
+
 This Bot monitors your Github repos and posts information about changes in your Discord channel.  
 It uses the **PyGithub** and **discord.py** modules for interacting with the API.  
+
+![discordchannel](./assets/discordbot.PNG)
 
 Before using the App, you have to register an Discord-Application and add the Bot to the server to obtain the ***DISCORD_TOKEN***.  
 Create the ***GITHUB_TOKEN*** on your GitHub account.
