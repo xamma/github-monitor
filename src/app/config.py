@@ -21,9 +21,10 @@ config_settings = AppConfig(**user_data)
 #-Config via Envs-----------------------
 """
 Configuration via ENVs has Precedence.
-They need to be set upper case.
+They need to be set upper case and are
+by default handled as string values.
 You can pass a list of repos via ENVS like this:
-$env:REPO_LIST="repo1", "repo2"
+$env:REPO_LIST="user/repo1, user/repo2"
 It is recommended to set your configuration via ENVs,
 to not expose secrets.
 """
