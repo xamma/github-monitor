@@ -45,10 +45,8 @@ metadata:
   name: bot-configmap
   namespace: discord-bot
 data:
-  REPO_LIST:
-    - xamma/testrepo123
-    - xamma/testrepo234
-  DISCORD_CHANNEL_ID: 1082199072984797245
+  REPO_LIST: "xamma/testrepo123, xamma/testrepo234"
+  DISCORD_CHANNEL_ID: "1082199072984797245"
 
 ---
 apiVersion: apps/v1
@@ -58,6 +56,10 @@ metadata:
   namespace: discord-bot
   labels:
     app: github-monitor
+spec:
+  selector:
+    matchLabels:
+      app: github-monitor
   replicas: 1
   strategy:
     rollingUpdate:
@@ -73,6 +75,7 @@ metadata:
       - name:  ghcr-creds
       containers:
       - image: ghcr.io/xamma/github-monitor:latest
+        imagePullPolicy: Always
         name:  discord-bot
         resources:
           requests:
@@ -102,8 +105,7 @@ metadata:
         # ports:
         # - containerPort:  5000
         #   name:  my-name
-      restartPolicy: OnFailure
-      imagePullPolicy: Always
+      restartPolicy: Always
 
 # not needed here, but for completeness
 # ---

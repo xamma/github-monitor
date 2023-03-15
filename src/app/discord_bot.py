@@ -61,7 +61,7 @@ class DiscordBot:
 
                 if message not in self.message_comp:
                     # Send a message to the Discord server with the commit details
-                    await self.ch.send(f'New commit by {author} in {repo}: {message} \n {commit_url}')
+                    await self.ch.send(f'New commit by {author} in {repo.name}: {message} \n {commit_url}')
                     self.message_comp.append(message)
                 else:
                     pass
